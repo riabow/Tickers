@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test task</title>
+  </head>
+  <body>
+    {{sel|safe}} <div id="showScale">Scale:</div>
+    <button onclick="change_scale(1)">+</button>
+    <button onclick="change_scale(-1)">-</button>
+    <button onclick="showlog()">show log</button>
+    <div id="info"></div>
+    <br>
+    
+
+    <canvas id="myCanvas" width="1000" height="400"
+    style="border:1px solid #570e0e;">
+    Your browser does not support the canvas element.
+    </canvas>
+    
+
+    <br>
+    <div style="display:none"  id="log"></div>
+
+    <script>
+      let ALL_TICKERS=[]
+      let SCALE = 5
+      const MAX_SIZE = 100
+      const C_WIDTH = 1000
+      const C_HEIGHT = 400
+      let CURRENT_TICKER = document.getElementById("tickers").value
+      change_scale(0)
+      const log = (text, color) => {
+        document.getElementById('log').innerHTML = `<span style="color: ${color}">${text}</span><br>`
+        //+ document.getElementById('log').innerHTML ;
+      };
+
+      const socket = new WebSocket('ws://' + location.host + '/echo')
+
+      socket.addEventListener('open', (ev) => {
+        socket.send('start');
+      });
+
+      socket.addEventListener('message', ev => {       
+        log('<<< ' + ev.data, 'blue');
+        const obj = JSON.parse(ev.data);
+        if (ALL_TICKERS.push(obj)>MAX_SIZE){
+           ALL_TICKERS.shift()
+        }
+        let draw_arr = []
+        let last_price = 0
+        for (let n = 0; n < ALL_TICKERS.length; n++){
+          last_price = ALL_TICKERS[n][CURRENT_TICKER]
+          draw_arr.push(last_price)
+        }
+        document.getElementById("info").innerHTML =""+ CURRENT_TICKER +"="+last_price
+        draw_chart(draw_arr, "red")
+
+      });
+      function showlog(){
+        document.getElementById("log").style.display = "block";
+      }
+      function change_scale(i){
+        SCALE +=i
+        document.getElementById("showScale").innerHTML = "Scale "+SCALE+":"
+      }
+      
+      function tickers_changed(){
+        CURRENT_TICKER = document.getElementById("tickers").value;
+      }
+       
+      function draw_gor_line(ctx, offcet ){
+        ctx.beginPath();  
+        ctx.lineWidth = 1
+        ctx.strokeStyle = "gray"
+        ctx.moveTo(0, (C_HEIGHT/2) + (offcet*SCALE));
+        ctx.lineTo(C_WIDTH, (C_HEIGHT/2) + (offcet*SCALE));
+        ctx.stroke()
+      }
+
+      function draw_chart(data, color){
+        var canvas = document.getElementById("myCanvas")
+        var ctx = canvas.getContext("2d")
+        canvas.width = canvas.width
+        
+        // zerro line
+        ctx.beginPath();   
+        ctx.lineWidth = 2
+        ctx.strokeStyle = "blue"
+        ctx.moveTo(0, C_HEIGHT/2);
+        ctx.lineTo(C_WIDTH, C_HEIGHT/2);
+        ctx.stroke()
+
+        draw_gor_line(ctx, 10 )
+        draw_gor_line(ctx, -10 )
+        draw_gor_line(ctx, -20 )
+        draw_gor_line(ctx,  20 )
+
+
+
+
+        ctx.beginPath();  
+        ctx.moveTo(0, C_HEIGHT/2)
+        ctx.strokeStyle = color
+        ctx.lineWidth = 2
+        x=0
+        for (let i = 0; i < data.length; i++) {
+          ctx.lineTo(x, (C_HEIGHT/2)-(data[i]*SCALE))
+          x+=10
+        }
+        ctx.stroke()          
+
+      }
+      
+      
+      
+
+
+    </script>
+  </body>
+</html>
