@@ -22,10 +22,10 @@
     <div style="display:none"  id="log"></div>
 
     <script>
-      let ALL_TICKERS=[]
+      let ALL_TICKERS=[] // главный массив данных
       let SCALE = 5
-      const MAX_SIZE = 100
-      const C_WIDTH = 1000
+      const MAX_SIZE = 100 // количество данных в истории
+      const C_WIDTH = 1000 // ширина и высота канваса
       const C_HEIGHT = 400
       let CURRENT_TICKER = document.getElementById("tickers").value
       change_scale(0)
@@ -33,16 +33,16 @@
         document.getElementById('log').innerHTML = `<span style="color: ${color}">${text}</span><br>`
         //+ document.getElementById('log').innerHTML ;
       };
-
+      
       const socket = new WebSocket('ws://' + location.host + '/echo')
 
       socket.addEventListener('open', (ev) => {
-        socket.send('start');
+        socket.send('start'); //устанавливаем соединение 
       });
 
       socket.addEventListener('message', ev => {       
-        log('<<< ' + ev.data, 'blue');
-        const obj = JSON.parse(ev.data);
+        log('<<< ' + ev.data, 'blue')
+        const obj = JSON.parse(ev.data)
         if (ALL_TICKERS.push(obj)>MAX_SIZE){
            ALL_TICKERS.shift()
         }
@@ -89,15 +89,14 @@
         ctx.moveTo(0, C_HEIGHT/2);
         ctx.lineTo(C_WIDTH, C_HEIGHT/2);
         ctx.stroke()
-
+        
+        // по хорошему нужно в цикле, но мне так нагляднее 
         draw_gor_line(ctx, 10 )
         draw_gor_line(ctx, -10 )
         draw_gor_line(ctx, -20 )
         draw_gor_line(ctx,  20 )
-
-
-
-
+        
+        // собственно рисуем график 
         ctx.beginPath();  
         ctx.moveTo(0, C_HEIGHT/2)
         ctx.strokeStyle = color
