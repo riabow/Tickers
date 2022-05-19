@@ -1,5 +1,6 @@
 # python 3.9 
 # Install:
+# git clone https://github.com/riabow/Tickers.git
 # pip install flask
 # pip install flask_sock
 # python ws2.py
