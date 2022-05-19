@@ -12,7 +12,7 @@ def generate_movement():
     return movement
 
 sel = '<select onchange="tickers_changed()" name="tickers" id="tickers">'
-TICKERS = {}
+TICKERS = {} #Здесь словарь с тикерами
 for n in range(0,100):
     tname = "ticker_{0:0>2}".format(n)
     sel += f'<option value="{tname}">{tname}</option>'
@@ -25,6 +25,7 @@ def index():
 
 
 def generate_next_data(tickers):
+    """ генерируем следуюшие значения """
     for n in tickers:
         tickers[n] += generate_movement()
     return tickers
@@ -36,6 +37,8 @@ def echo(sock):
     while True:
         #data = sock.receive()
         n = 0
+        # при установлении соединения уходим в бесконечный цикл 
+        # и отправляем новые данные на фронт
         while True:
             js = json.dumps(generate_next_data(TICKERS))
             sock.send(js)
