@@ -1,8 +1,8 @@
 # python 3.9 
 # Install:
-pip install flask
-pip install flask_sock
-python ws2.py
+# pip install flask
+# pip install flask_sock
+# python ws2.py
 # go to http://127.0.0.0:5000
 
 
